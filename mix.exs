@@ -45,6 +45,7 @@ defmodule Franz.MixProject do
       {:kafka_protocol, "~> 4.1.0"},
       {:keyword_validator, "~> 2.0.1"},
       {:poolboy, "~> 1.5.1"},
+      {:uuid, " ~> 1.1.8"},
       {:ex_machina, "~> 2.7.0", only: [:dev, :test]},
       {:credo, "~> 1.7.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.1", only: [:dev, :test], runtime: false},
