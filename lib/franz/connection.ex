@@ -15,7 +15,7 @@ defmodule Franz.Connection do
   defstruct [:config, :endpoints]
 
   @type config :: keyword()
-  @type endpoints :: [{host :: binary(), port :: node()}]
+  @type endpoints :: [{host :: binary(), port :: non_neg_integer()}]
   @type t :: %__MODULE__{config: config(), endpoints: endpoints()}
 
   @opts_schema KeywordValidator.schema!(
@@ -45,7 +45,7 @@ defmodule Franz.Connection do
   end
 
   @doc """
-  Returns a coonection struct representing the given process.
+  Returns a connection struct representing the given process.
   """
   @spec get(GenServer.name() | pid()) :: t()
   def get(name_or_pid), do: GenServer.call(name_or_pid, :get)
@@ -58,9 +58,11 @@ defmodule Franz.Connection do
   @impl GenServer
   @spec init(keyword()) :: {:ok, map()} | {:stop, any()}
   def init(opts) do
-    with {:ok, opts} <- validate_opts(opts, @opts_schema),
+    with {:ok, opts} <- validate(opts, @opts_schema),
          {:ok, state} <- init_state(opts) do
       test_connection(state)
+    else
+      {:error, reason} -> {:stop, reason}
     end
   end
 
@@ -100,7 +102,7 @@ defmodule Franz.Connection do
         {:ok, opts}
     end
   rescue
-    MatchError -> {:stop, :invalid_uri}
+    MatchError -> {:error, :invalid_uri}
   end
 
   defp build_state(opts) do
