@@ -3,31 +3,34 @@ defmodule Franz.Topology.Topic do
   TODO(Gordon) - Add this
   """
 
-  alias Franz.Topology
+  alias Franz.Topology.Topic.{Config, Partition}
 
-  @enforce_keys [:name, :num_partitions, :replication_factor, :configs]
-  defstruct [:name, :num_partitions, :replication_factor, :configs]
-
-  @type config :: {name :: binary(), value :: any(), status :: :assumed | :confirmed}
+  @enforce_keys [:error_code, :is_internal, :name, :partitions, :configs]
+  defstruct [:error_code, :is_internal, :name, :partitions, :configs]
 
   @type t :: %__MODULE__{
+          error_code: atom(),
+          is_internal: boolean(),
           name: binary(),
-          num_partitions: pos_integer(),
-          replication_factor: pos_integer(),
-          configs: [config()]
+          partitions: [Partition] | :skipped,
+          configs: [Config]
         }
 
   ################################
   # Public API
   ################################
 
-  @spec new(Topology.topic_create_config()) :: t()
-  def new(config) do
+  @doc """
+  Creates a Topic struct from a map of params and a map of configs.
+  """
+  @spec from_map(map(), map()) :: t()
+  def from_map(map, configs \\ %{}) do
     %__MODULE__{
-      name: Keyword.get(config, :name),
-      num_partitions: Keyword.get(config, :num_partitions),
-      replication_factor: Keyword.get(config, :replication_factor),
-      configs: serialize_configs(Keyword.get(config, :configs, []))
+      error_code: map.error_code,
+      is_internal: map.is_internal,
+      name: map.name,
+      partitions: build_partitions(map.partitions),
+      configs: build_configs(configs)
     }
   end
 
@@ -35,7 +38,13 @@ defmodule Franz.Topology.Topic do
   # Private API
   ################################
 
-  defp serialize_configs(configs) do
-    Enum.map(configs, fn {key, val} -> {key, val, :confirmed} end)
+  defp build_configs(%{}), do: :skipped
+
+  defp build_configs(configs) do
+    Enum.map(configs, &Config.from_tuple/1)
+  end
+
+  defp build_partitions(partitions) do
+    Enum.map(partitions, &Partition.from_map/1)
   end
 end

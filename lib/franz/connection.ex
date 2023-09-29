@@ -3,7 +3,7 @@ defmodule Franz.Connection do
   TODO(Gordon) - Add this
   """
 
-  # TODO(Gordon) - stricter checks for opts
+  # TODO(Gordon) - stricter checks for opts?
   # TODO(Gordon) - ssl without sasl?
   # TODO(Gordon) - More rigorous testing when answers are found
 
@@ -58,7 +58,7 @@ defmodule Franz.Connection do
   @impl GenServer
   @spec init(keyword()) :: {:ok, map()} | {:stop, any()}
   def init(opts) do
-    with {:ok, opts} <- validate(opts, @opts_schema),
+    with {:ok, opts} <- validate_keyword(opts, @opts_schema),
          {:ok, state} <- init_state(opts) do
       test_connection(state)
     else

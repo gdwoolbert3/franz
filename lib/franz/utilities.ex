@@ -3,6 +3,8 @@ defmodule Franz.Utilities do
   TODO(Gordon) - Add this
   """
 
+  # TODO(Gordon) - add tests?
+
   ################################
   # Public API
   ################################
@@ -10,9 +12,9 @@ defmodule Franz.Utilities do
   @doc """
   Validates the given keyword matches the given schema.
   """
-  @spec validate(keyword(), KeywordValidator.schema(), keyword()) ::
+  @spec validate_keyword(keyword(), KeywordValidator.schema(), keyword()) ::
           {:ok, keyword} | {:error, KeywordValidator.invalid()}
-  def validate(keyword, schema, opts \\ []) do
+  def validate_keyword(keyword, schema, opts \\ []) do
     KeywordValidator.validate(keyword, schema, opts)
   end
 end
